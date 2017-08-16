@@ -3,7 +3,6 @@
 set -xe
 
 pip install --upgrade pip
-python setup.py install
 rm -rf dist
 python setup.py sdist
 python setup.py bdist_wheel --universal
