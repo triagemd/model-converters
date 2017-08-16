@@ -1,0 +1,38 @@
+version: '2'
+services:
+  inception_v3:
+    image: triage/tensorflow-serving-base:1
+    volumes:
+      - .cache/models/inception_v3:/model/1
+    ports:
+      - "9001:9000"
+  mobilenet_v1:
+    image: triage/tensorflow-serving-base:1
+    volumes:
+      - .cache/models/mobilenet_v1:/model/1
+    ports:
+      - "9002:9000"
+  resnet50:
+    image: triage/tensorflow-serving-base:1
+    volumes:
+      - .cache/models/resnet50:/model/1
+    ports:
+      - "9003:9000"
+  xception:
+    image: triage/tensorflow-serving-base:1
+    volumes:
+      - .cache/models/xception:/model/1
+    ports:
+      - "9004:9000"
+  vgg16:
+    image: triage/tensorflow-serving-base:1
+    volumes:
+      - .cache/models/vgg16:/model/1
+    ports:
+      - "9005:9000"
+  vgg19:
+    image: triage/tensorflow-serving-base:1
+    volumes:
+      - .cache/models/vgg19:/model/1
+    ports:
+      - "9006:9000"
