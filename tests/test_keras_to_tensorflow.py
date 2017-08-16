@@ -7,7 +7,8 @@ from subprocess import call
 from tensorflow_serving_client import TensorflowServingClient
 from grpc.framework.interfaces.face.face import AbortionError
 
-from ml_tools import KerasToTensorflow, load_image, get_model_spec
+from model_converters import KerasToTensorflow
+from ml_tools import load_image, get_model_spec
 
 
 MODEL_SERVING_PORTS = {

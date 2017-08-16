@@ -19,6 +19,7 @@ setup(
         'keras',
         'h5py',
         'pillow',
+        'ml-tools>=0.0.6',
         'tensorflow-serving-client>=0.0.5',
         #'coremltools' <- NOTE!: coremltools is currently Python 2.7 only
     ]
