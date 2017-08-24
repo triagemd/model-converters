@@ -4,11 +4,11 @@ ARGS="${@:-tests/}"
 set -e
 
 # Wait until the tensorflow-serving connection is up.
-for port in $(seq 1 6); do
+for port in $(seq 9001 9006); do
   n=0
   until [ $n -ge 10 ]
   do
-    nc -z localhost $port && break
+    if nc -z localhost $port; then break; fi
     n=$[$n+1]
     sleep 5
   done
