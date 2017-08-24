@@ -1,5 +1,8 @@
 -e .
 
+# *just for tests*, since we check prediction output (which changes across model versions)
+keras==2.0.6
+
 pytest
 pytest-cov
 flake8
