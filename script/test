@@ -8,7 +8,7 @@ for port in $(seq 9001 9006); do
   n=0
   until [ $n -ge 10 ]
   do
-    if nc -z localhost $port; then break; fi
+    if [[ $(nc localhost $port -w 5 | wc -c) -ne 0 ]]; then break; fi
     n=$[$n+1]
     sleep 5
   done
