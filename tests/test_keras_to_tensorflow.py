@@ -53,7 +53,7 @@ def restart_serving_container(model_name):
                     break
             except ConnectionRefusedError:
                 pass
-            time.sleep(2)
+            time.sleep(5)
 
 
 def assert_converted_model(tf_model_dir):
