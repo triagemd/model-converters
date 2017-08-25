@@ -1,8 +1,8 @@
 import os
 import time
 import shutil
-
-from subprocess import call
+import socket
+import subprocess
 
 from tensorflow_serving_client import TensorflowServingClient
 from grpc.framework.interfaces.face.face import AbortionError
@@ -41,9 +41,19 @@ def setup_model(name, model_path):
 
 
 def restart_serving_container(model_name):
-    time.sleep(2)
-    call(['docker-compose', 'restart', model_name])
-    time.sleep(2)
+    subprocess.call(['docker-compose', 'restart', model_name])
+    for port in MODEL_SERVING_PORTS.values():
+        attempt = 0
+        while attempt <= 10:
+            attempt += 1
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.connect(('localhost', port))
+                if len(s.recv(1)) > 0:
+                    break
+            except ConnectionRefusedError:
+                pass
+            time.sleep(2)
 
 
 def assert_converted_model(tf_model_dir):
