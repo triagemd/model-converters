@@ -3,6 +3,7 @@ import time
 import shutil
 import socket
 import subprocess
+import numpy as np
 
 from tensorflow_serving_client import TensorflowServingClient
 
@@ -77,7 +78,12 @@ def assert_model_serving(model_name, imagenet_dictionary, expected_top_5):
     predictions = sorted(predictions, reverse=True, key=lambda kv: kv[1])[:5]
     predictions = [(label, float(score)) for label, score in predictions]
     print(predictions)
-    assert predictions == expected_top_5
+    classes = [name for name, _ in predictions]
+    expected_classes = [name for name, _ in expected_top_5]
+    assert classes == expected_classes
+    scores = [score for _, score in predictions]
+    expected_scores = [score for _, score in expected_top_5]
+    np.testing.assert_array_almost_equal_nulp(np.array(scores), np.array(expected_scores))
 
 
 def test_convert_imagenet_inception_v3(temp_file, imagenet_dictionary):
