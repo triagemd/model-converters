@@ -73,7 +73,7 @@ def assert_model_serving(model_name, imagenet_dictionary, expected_top_5):
             assert predictions == expected_top_5
             break
         except AbortionError as e:
-            if e.details != 'Endpoint read failed' or attempt > 5:
+            if attempt > 5:
                 raise
             time.sleep(1)
             attempt += 1
