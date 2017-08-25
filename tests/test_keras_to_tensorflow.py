@@ -51,7 +51,7 @@ def restart_serving_container(model_name):
                 s.connect(('localhost', port))
                 if len(s.recv(1)) > 0:
                     break
-            except ConnectionRefusedError:
+            except OSError:  # ConnectionRefusedError but with Python 2 support
                 pass
             time.sleep(5)
 
