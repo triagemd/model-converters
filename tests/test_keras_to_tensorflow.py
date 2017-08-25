@@ -80,6 +80,7 @@ def assert_model_serving(model_name, imagenet_dictionary, expected_top_5):
             predictions = list(zip(imagenet_dictionary, predictions))
             predictions = sorted(predictions, reverse=True, key=lambda kv: kv[1])[:5]
             predictions = [(label, float(score)) for label, score in predictions]
+            print(predictions)
             assert predictions == expected_top_5
             break
         except AbortionError as e:
@@ -96,11 +97,11 @@ def test_convert_imagenet_inception_v3(temp_file, imagenet_dictionary):
     assert_converted_model(tf_model_dir)
     restart_serving_container(model_name)
     assert_model_serving(model_name, imagenet_dictionary, [
-        ('tiger cat', 0.47168827056884766),
-        ('Egyptian cat', 0.1279538869857788),
-        ('Pembroke, Pembroke Welsh corgi', 0.07338253408670425),
+        ('tiger cat', 0.4716886878013611),
+        ('Egyptian cat', 0.127954363822937),
+        ('Pembroke, Pembroke Welsh corgi', 0.07338221371173859),
         ('tabby, tabby cat', 0.052391838282346725),
-        ('Cardigan, Cardigan Welsh corgi', 0.008323835209012032)
+        ('Cardigan, Cardigan Welsh corgi', 0.008323794230818748)
     ])
 
 
@@ -111,11 +112,11 @@ def test_convert_imagenet_mobilenet(temp_file, imagenet_dictionary):
     assert_converted_model(tf_model_dir)
     restart_serving_container(model_name)
     assert_model_serving(model_name, imagenet_dictionary, [
-        ('tiger cat', 0.334695041179657),
-        ('Egyptian cat', 0.28513845801353455),
-        ('tabby, tabby cat', 0.1547166407108307),
-        ('kit fox, Vulpes macrotis', 0.03160473331809044),
-        ('lynx, catamount', 0.030886217951774597)
+        ('tiger cat', 0.334694504737854),
+        ('Egyptian cat', 0.2851393222808838),
+        ('tabby, tabby cat', 0.15471667051315308),
+        ('kit fox, Vulpes macrotis', 0.03160465136170387),
+        ('lynx, catamount', 0.030886519700288773)
     ])
 
 
@@ -126,11 +127,11 @@ def test_convert_imagenet_resnet50(temp_file, imagenet_dictionary):
     assert_converted_model(tf_model_dir)
     restart_serving_container(model_name)
     assert_model_serving(model_name, imagenet_dictionary, [
-        ('red fox, Vulpes vulpes', 0.3193321228027344),
-        ('kit fox, Vulpes macrotis', 0.19359812140464783),
-        ('weasel', 0.14291061460971832),
-        ('Pembroke, Pembroke Welsh corgi', 0.13959810137748718),
-        ('lynx, catamount', 0.0461868941783905)
+        ('red fox, Vulpes vulpes', 0.3193315863609314),
+        ('kit fox, Vulpes macrotis', 0.19359852373600006),
+        ('weasel', 0.14291106164455414),
+        ('Pembroke, Pembroke Welsh corgi', 0.1395975947380066),
+        ('lynx, catamount', 0.04618712514638901)
     ])
 
 
@@ -141,11 +142,11 @@ def test_convert_imagenet_xception(temp_file, imagenet_dictionary):
     assert_converted_model(tf_model_dir)
     restart_serving_container(model_name)
     assert_model_serving(model_name, imagenet_dictionary, [
-        ('red fox, Vulpes vulpes', 0.10058525949716568),
-        ('weasel', 0.09152577072381973),
-        ('Pembroke, Pembroke Welsh corgi', 0.07581677287817001),
-        ('tiger cat', 0.07467170804738998),
-        ('kit fox, Vulpes macrotis', 0.06751599907875061)
+        ('red fox, Vulpes vulpes', 0.10058529675006866),
+        ('weasel', 0.09152575582265854),
+        ('Pembroke, Pembroke Welsh corgi', 0.07581676542758942),
+        ('tiger cat', 0.0746716633439064),
+        ('kit fox, Vulpes macrotis', 0.06751589477062225)
     ])
 
 
@@ -156,11 +157,11 @@ def test_convert_imagenet_vgg16(temp_file, imagenet_dictionary):
     assert_converted_model(tf_model_dir)
     restart_serving_container(model_name)
     assert_model_serving(model_name, imagenet_dictionary, [
-        ('kit fox, Vulpes macrotis', 0.3090210556983948),
-        ('red fox, Vulpes vulpes', 0.21598467230796814),
-        ('Egyptian cat', 0.13274021446704865),
-        ('tiger cat', 0.11005253344774246),
-        ('tabby, tabby cat', 0.08285782486200333)
+        ('kit fox, Vulpes macrotis', 0.3090206980705261),
+        ('red fox, Vulpes vulpes', 0.21598483622074127),
+        ('Egyptian cat', 0.1327403038740158),
+        ('tiger cat', 0.11005250364542007),
+        ('tabby, tabby cat', 0.08285804092884064)
     ])
 
 
@@ -171,9 +172,9 @@ def test_convert_imagenet_vgg19(temp_file, imagenet_dictionary):
     assert_converted_model(tf_model_dir)
     restart_serving_container(model_name)
     assert_model_serving(model_name, imagenet_dictionary, [
-        ('red fox, Vulpes vulpes', 0.3812934458255768),
-        ('kit fox, Vulpes macrotis', 0.2726273238658905),
-        ('tiger cat', 0.0855349525809288),
-        ('lynx, catamount', 0.05379558727145195),
-        ('Egyptian cat', 0.04786992818117142)
+        ('red fox, Vulpes vulpes', 0.3812929391860962),
+        ('kit fox, Vulpes macrotis', 0.27262774109840393),
+        ('tiger cat', 0.08553500473499298),
+        ('lynx, catamount', 0.05379556491971016),
+        ('Egyptian cat', 0.047869954258203506)
     ])
