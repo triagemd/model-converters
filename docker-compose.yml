@@ -1,38 +1,44 @@
-version: '2'
+version: '3'
 services:
   inception_v3:
-    image: triage/tensorflow-model-serving
+    image: triage/python2.7-tensorflow-serving
     volumes:
       - .cache/models/inception_v3:/model/1
     ports:
       - "9001:9000"
+    command: "tensorflow_model_server --port=9000 --model_name=model --model_base_path=/model"
   mobilenet_v1:
-    image: triage/tensorflow-model-serving
+    image: triage/python2.7-tensorflow-serving
     volumes:
       - .cache/models/mobilenet_v1:/model/1
     ports:
       - "9002:9000"
+    command: "tensorflow_model_server --port=9000 --model_name=model --model_base_path=/model"
   resnet50:
-    image: triage/tensorflow-model-serving
+    image: triage/python2.7-tensorflow-serving
     volumes:
       - .cache/models/resnet50:/model/1
     ports:
       - "9003:9000"
+    command: "tensorflow_model_server --port=9000 --model_name=model --model_base_path=/model"
   xception:
-    image: triage/tensorflow-model-serving
+    image: triage/python2.7-tensorflow-serving
     volumes:
       - .cache/models/xception:/model/1
     ports:
       - "9004:9000"
+    command: "tensorflow_model_server --port=9000 --model_name=model --model_base_path=/model"
   vgg16:
-    image: triage/tensorflow-model-serving
+    image: triage/python2.7-tensorflow-serving
     volumes:
       - .cache/models/vgg16:/model/1
     ports:
       - "9005:9000"
+    command: "tensorflow_model_server --port=9000 --model_name=model --model_base_path=/model"
   vgg19:
-    image: triage/tensorflow-model-serving
+    image: triage/python2.7-tensorflow-serving
     volumes:
       - .cache/models/vgg19:/model/1
     ports:
       - "9006:9000"
+    command: "tensorflow_model_server --port=9000 --model_name=model --model_base_path=/model"
