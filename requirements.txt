@@ -11,3 +11,4 @@ pep8
 autopep8
 requests
 backports.tempfile
+numpy

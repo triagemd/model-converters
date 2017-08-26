@@ -1,11 +1,11 @@
 import os
 import time
 import shutil
-
-from subprocess import call
+import socket
+import subprocess
+import numpy as np
 
 from tensorflow_serving_client import TensorflowServingClient
-from grpc.framework.interfaces.face.face import AbortionError
 
 from model_converters import KerasToTensorflow
 from ml_tools import load_image, get_model_spec
@@ -41,9 +41,19 @@ def setup_model(name, model_path):
 
 
 def restart_serving_container(model_name):
-    time.sleep(2)
-    call(['docker-compose', 'restart', model_name])
-    time.sleep(2)
+    subprocess.call(['docker-compose', 'restart', model_name])
+    for port in MODEL_SERVING_PORTS.values():
+        attempt = 0
+        while attempt <= 15:
+            attempt += 1
+            try:
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.connect(('localhost', port))
+                if len(s.recv(1)) > 0:
+                    break
+            except socket.error:
+                pass
+            time.sleep(5)
 
 
 def assert_converted_model(tf_model_dir):
@@ -56,27 +66,24 @@ def assert_converted_model(tf_model_dir):
 
 def assert_model_serving(model_name, imagenet_dictionary, expected_top_5):
     model_spec = get_model_spec(model_name)
-    attempt = 1
-    while True:
-        try:
-            client = TensorflowServingClient('localhost', MODEL_SERVING_PORTS[model_name])
-            image_data = load_image('tests/fixtures/files/cat.jpg', model_spec.target_size,
-                                    preprocess_input=model_spec.preprocess_input)
-            result = client.make_prediction(image_data, 'image')
-            assert 'class_probabilities' in result
-            assert len(result['class_probabilities']) == 1
-            assert len(result['class_probabilities'][0]) == 1000
-            predictions = result['class_probabilities'][0]
-            predictions = list(zip(imagenet_dictionary, predictions))
-            predictions = sorted(predictions, reverse=True, key=lambda kv: kv[1])[:5]
-            predictions = [(label, float(score)) for label, score in predictions]
-            assert predictions == expected_top_5
-            break
-        except AbortionError as e:
-            if e.details != 'Endpoint read failed' or attempt > 5:
-                raise
-            time.sleep(1)
-            attempt += 1
+    client = TensorflowServingClient('localhost', MODEL_SERVING_PORTS[model_name])
+    image_data = load_image('tests/fixtures/files/cat.jpg', model_spec.target_size,
+                            preprocess_input=model_spec.preprocess_input)
+    result = client.make_prediction(image_data, 'image')
+    assert 'class_probabilities' in result
+    assert len(result['class_probabilities']) == 1
+    assert len(result['class_probabilities'][0]) == 1000
+    predictions = result['class_probabilities'][0]
+    predictions = list(zip(imagenet_dictionary, predictions))
+    predictions = sorted(predictions, reverse=True, key=lambda kv: kv[1])[:5]
+    predictions = [(label, float(score)) for label, score in predictions]
+    print(predictions)
+    classes = [name for name, _ in predictions]
+    expected_classes = [name for name, _ in expected_top_5]
+    assert classes == expected_classes
+    scores = [score for _, score in predictions]
+    expected_scores = [score for _, score in expected_top_5]
+    np.testing.assert_array_almost_equal_nulp(np.array(scores), np.array(expected_scores))
 
 
 def test_convert_imagenet_inception_v3(temp_file, imagenet_dictionary):
@@ -86,11 +93,11 @@ def test_convert_imagenet_inception_v3(temp_file, imagenet_dictionary):
     assert_converted_model(tf_model_dir)
     restart_serving_container(model_name)
     assert_model_serving(model_name, imagenet_dictionary, [
-        ('impala, Aepyceros melampus', 0.4716886878013611),
-        ('llama', 0.127954363822937),
-        ('fox squirrel, eastern fox squirrel, Sciurus niger', 0.07338221371173859),
-        ('hartebeest', 0.052391838282346725),
-        ('marmot', 0.008323794230818748),
+        ('tiger cat', 0.4716886878013611),
+        ('Egyptian cat', 0.127954363822937),
+        ('Pembroke, Pembroke Welsh corgi', 0.07338221371173859),
+        ('tabby, tabby cat', 0.052391838282346725),
+        ('Cardigan, Cardigan Welsh corgi', 0.008323794230818748)
     ])
 
 
@@ -101,11 +108,11 @@ def test_convert_imagenet_mobilenet(temp_file, imagenet_dictionary):
     assert_converted_model(tf_model_dir)
     restart_serving_container(model_name)
     assert_model_serving(model_name, imagenet_dictionary, [
-        ('impala, Aepyceros melampus', 0.334694504737854),
-        ('llama', 0.2851393222808838),
-        ('hartebeest', 0.15471667051315308),
-        ('bighorn, bighorn sheep, cimarron, Rocky Mountain bighorn, Rocky Mountain sheep, Ovis canadensis', 0.03160465136170387),
-        ('mink', 0.030886519700288773),
+        ('tiger cat', 0.334694504737854),
+        ('Egyptian cat', 0.2851393222808838),
+        ('tabby, tabby cat', 0.15471667051315308),
+        ('kit fox, Vulpes macrotis', 0.03160465136170387),
+        ('lynx, catamount', 0.030886519700288773)
     ])
 
 
@@ -116,11 +123,11 @@ def test_convert_imagenet_resnet50(temp_file, imagenet_dictionary):
     assert_converted_model(tf_model_dir)
     restart_serving_container(model_name)
     assert_model_serving(model_name, imagenet_dictionary, [
-        ('ram, tup', 0.3193315863609314),
-        ('bighorn, bighorn sheep, cimarron, Rocky Mountain bighorn, Rocky Mountain sheep, Ovis canadensis', 0.19359852373600006),
-        ('Band Aid', 0.14291106164455414),
-        ('fox squirrel, eastern fox squirrel, Sciurus niger', 0.1395975947380066),
-        ('mink', 0.04618712514638901),
+        ('red fox, Vulpes vulpes', 0.3193315863609314),
+        ('kit fox, Vulpes macrotis', 0.19359852373600006),
+        ('weasel', 0.14291106164455414),
+        ('Pembroke, Pembroke Welsh corgi', 0.1395975947380066),
+        ('lynx, catamount', 0.04618712514638901)
     ])
 
 
@@ -131,11 +138,11 @@ def test_convert_imagenet_xception(temp_file, imagenet_dictionary):
     assert_converted_model(tf_model_dir)
     restart_serving_container(model_name)
     assert_model_serving(model_name, imagenet_dictionary, [
-        ('ram, tup', 0.10058529675006866),
-        ('Band Aid', 0.09152575582265854),
-        ('fox squirrel, eastern fox squirrel, Sciurus niger', 0.07581676542758942),
-        ('impala, Aepyceros melampus', 0.0746716633439064),
-        ('bighorn, bighorn sheep, cimarron, Rocky Mountain bighorn, Rocky Mountain sheep, Ovis canadensis', 0.06751589477062225),
+        ('red fox, Vulpes vulpes', 0.10058529675006866),
+        ('weasel', 0.09152575582265854),
+        ('Pembroke, Pembroke Welsh corgi', 0.07581676542758942),
+        ('tiger cat', 0.0746716633439064),
+        ('kit fox, Vulpes macrotis', 0.06751589477062225)
     ])
 
 
@@ -146,11 +153,11 @@ def test_convert_imagenet_vgg16(temp_file, imagenet_dictionary):
     assert_converted_model(tf_model_dir)
     restart_serving_container(model_name)
     assert_model_serving(model_name, imagenet_dictionary, [
-        ('bighorn, bighorn sheep, cimarron, Rocky Mountain bighorn, Rocky Mountain sheep, Ovis canadensis', 0.3090206980705261),
-        ('ram, tup', 0.21598483622074127),
-        ('llama', 0.1327403038740158),
-        ('impala, Aepyceros melampus', 0.11005250364542007),
-        ('hartebeest', 0.08285804092884064),
+        ('kit fox, Vulpes macrotis', 0.3090206980705261),
+        ('red fox, Vulpes vulpes', 0.21598483622074127),
+        ('Egyptian cat', 0.1327403038740158),
+        ('tiger cat', 0.11005250364542007),
+        ('tabby, tabby cat', 0.08285804092884064)
     ])
 
 
@@ -161,9 +168,9 @@ def test_convert_imagenet_vgg19(temp_file, imagenet_dictionary):
     assert_converted_model(tf_model_dir)
     restart_serving_container(model_name)
     assert_model_serving(model_name, imagenet_dictionary, [
-        ('ram, tup', 0.3812929391860962),
-        ('bighorn, bighorn sheep, cimarron, Rocky Mountain bighorn, Rocky Mountain sheep, Ovis canadensis', 0.27262774109840393),
-        ('impala, Aepyceros melampus', 0.08553500473499298),
-        ('mink', 0.05379556491971016),
-        ('llama', 0.047869954258203506),
+        ('red fox, Vulpes vulpes', 0.3812929391860962),
+        ('kit fox, Vulpes macrotis', 0.27262774109840393),
+        ('tiger cat', 0.08553500473499298),
+        ('lynx, catamount', 0.05379556491971016),
+        ('Egyptian cat', 0.047869954258203506)
     ])
