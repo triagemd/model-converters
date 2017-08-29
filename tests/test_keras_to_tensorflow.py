@@ -43,7 +43,7 @@ def setup_model(name, model_path):
 def restart_serving_container(model_name):
     subprocess.call(['docker-compose', 'restart', model_name])
     attempt = 0
-    while attempt <= 15:
+    while attempt <= 60:
         attempt += 1
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -52,7 +52,7 @@ def restart_serving_container(model_name):
                 break
         except socket.error:
             pass
-        time.sleep(5)
+        time.sleep(1)
 
 
 def assert_converted_model(tf_model_dir):
