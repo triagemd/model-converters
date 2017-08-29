@@ -42,18 +42,17 @@ def setup_model(name, model_path):
 
 def restart_serving_container(model_name):
     subprocess.call(['docker-compose', 'restart', model_name])
-    for port in MODEL_SERVING_PORTS.values():
-        attempt = 0
-        while attempt <= 15:
-            attempt += 1
-            try:
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.connect(('localhost', port))
-                if len(s.recv(1)) > 0:
-                    break
-            except socket.error:
-                pass
-            time.sleep(5)
+    attempt = 0
+    while attempt <= 15:
+        attempt += 1
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect(('localhost', MODEL_SERVING_PORTS[model_name]))
+            if len(s.recv(1)) > 0:
+                break
+        except socket.error:
+            pass
+        time.sleep(5)
 
 
 def assert_converted_model(tf_model_dir):
