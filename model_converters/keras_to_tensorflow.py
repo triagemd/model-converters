@@ -10,7 +10,8 @@ class KerasToTensorflow(object):
         return keras.models.load_model(model_path, custom_objects={
             # for mobilenet import, doesn't affect other model types
             'relu6': keras.applications.mobilenet.relu6,
-            'DepthwiseConv2D': keras.applications.mobilenet.DepthwiseConv2D
+            'DepthwiseConv2D': keras.applications.mobilenet.DepthwiseConv2D,
+            'tf': tensorflow
         })
 
     @staticmethod
