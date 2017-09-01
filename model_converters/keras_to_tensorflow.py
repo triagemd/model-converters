@@ -7,12 +7,19 @@ class KerasToTensorflow(object):
 
     @staticmethod
     def load_keras_model(model_path):
-        return keras.models.load_model(model_path, custom_objects={
-            # for mobilenet import, doesn't affect other model types
-            'relu6': keras.applications.mobilenet.relu6,
-            'DepthwiseConv2D': keras.applications.mobilenet.DepthwiseConv2D,
+        custom_objects = {
+            # just in case you have Lambda layers which implicitly 'import tensorflow as tf'
+            # (happens to be the case for some of our internal code)
             'tf': tensorflow
-        })
+        }
+        try:
+            # for mobilenet import, doesn't affect other model types
+            custom_objects['relu6'] = keras.applications.mobilenet.relu6
+            custom_objects['DepthwiseConv2D'] = keras.applications.mobilenet.DepthwiseConv2D
+        except AttributeError:
+            pass
+
+        return keras.models.load_model(model_path, custom_objects=custom_objects)
 
     @staticmethod
     def convert(model_path, output_dir, output_stripped_model_path=None):
