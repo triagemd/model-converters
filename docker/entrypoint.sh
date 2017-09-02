@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 if [ -z "$KERAS_VERSION" ]; then
   echo "KERAS_VERSION not specified"

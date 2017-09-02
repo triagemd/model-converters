@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -e
+VERSION=$(grep "version=" setup.py | tr -d "version='" | tr -d ",'" | tr -d "[:space:]")
+set -x
+docker build -t triage/model-converter:$VERSION docker
+docker build -t triage/model-converter:latest docker
+docker push triage/model-converter:$VERSION
+docker push triage/model-converter:latest
