@@ -22,6 +22,6 @@ else
 fi
 
 $PIP install -f /pip "tensorflow==$TENSORFLOW_VERSION" "keras==$KERAS_VERSION" h5py
-stored sync "$MODEL_INPUT" /input
-$PYTHON /usr/local/bin/keras_to_tensorflow "/input/$MODEL_INPUT" /output
+mkdir /input && stored sync "$MODEL_INPUT" /input/model.hdf5
+$PYTHON /usr/local/bin/keras_to_tensorflow /input/model.hdf5 /output
 stored sync /output "$MODEL_OUTPUT"
