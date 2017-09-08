@@ -21,6 +21,7 @@ else
   exit 1
 fi
 
-$PIP install -f /pip "tensorflow==$TENSORFLOW_VERSION" "keras==$KERAS_VERSION" h5py model-converters
-$PYTHON /usr/local/bin/keras_to_tensorflow "/model_input/$MODEL_INPUT_FILENAME" "/model_output/$MODEL_OUTPUT_DIRNAME"
-chmod -R 0777 /model_output
+$PIP install -f /pip "tensorflow==$TENSORFLOW_VERSION" "keras==$KERAS_VERSION" h5py
+mkdir /input && stored sync "$MODEL_INPUT" /input/model.hdf5
+$PYTHON /usr/local/bin/keras_to_tensorflow /input/model.hdf5 /output
+stored sync /output "$MODEL_OUTPUT"
