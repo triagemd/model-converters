@@ -4,7 +4,7 @@ RUN apt-get -y update && \
     apt-get -y install python-pip python3-pip && \
     pip2 install --upgrade pip && \
     pip3 install --upgrade pip && \
-    pip install stored
+    pip install stored>=0.0.29
 
 # we install these packages at runtime in the entrypoint, but might as well fetch the latest version into the container
 RUN mkdir /pip && \
