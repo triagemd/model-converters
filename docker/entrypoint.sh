@@ -21,6 +21,7 @@ else
   exit 1
 fi
 
+$PIP install --upgrade pip
 $PIP install -f /pip "tensorflow==$TENSORFLOW_VERSION" "keras==$KERAS_VERSION" h5py model-converters
 mkdir /input && stored sync "$MODEL_INPUT" /input/model.hdf5
 $PYTHON /usr/local/bin/keras_to_tensorflow /input/model.hdf5 /output
