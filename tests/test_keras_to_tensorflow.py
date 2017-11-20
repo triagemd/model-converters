@@ -19,6 +19,9 @@ MODEL_SERVING_PORTS = {
     'xception': 9004,
     'vgg16': 9005,
     'vgg19': 9006,
+    'inception_resnet_v2': 9007,
+    'inception_v4': 9008,
+    'resnet152': 9009,
 }
 
 
@@ -34,7 +37,7 @@ def setup_model(name, model_path):
     tf_model_dir = '.cache/models/%s' % (name, )
 
     model_spec = get_model_spec(name)
-    model = model_spec.klass(weights='imagenet', input_shape=model_spec.target_size)
+    model = model_spec.klass(weights='imagenet', input_shape=tuple(model_spec.target_size))
     model_dir = os.path.dirname(model_path)
     if not os.path.exists(model_dir):
         os.makedirs(model_dir)
@@ -94,13 +97,16 @@ def assert_model_serving(model_name, imagenet_dictionary, expected_top_5):
     np.testing.assert_array_almost_equal_nulp(np.array(scores), np.array(expected_scores))
 
 
-def test_convert_imagenet_inception_v3(temp_file, imagenet_dictionary):
-    model_name = 'inception_v3'
+def assert_model_conversion_and_prediction(temp_file, imagenet_dictionary, model_name, expected_top_5):
     tf_model_dir = setup_model(model_name, temp_file)
     KerasToTensorflow.convert(temp_file, tf_model_dir)
     assert_converted_model(tf_model_dir)
     restart_serving_container(model_name)
-    assert_model_serving(model_name, imagenet_dictionary, [
+    assert_model_serving(model_name, imagenet_dictionary, expected_top_5)
+
+
+def test_convert_imagenet_inception_v3(temp_file, imagenet_dictionary):
+    assert_model_conversion_and_prediction(temp_file, imagenet_dictionary, 'inception_v3', [
         ('tiger cat', 0.4716886878013611),
         ('Egyptian cat', 0.127954363822937),
         ('Pembroke, Pembroke Welsh corgi', 0.07338221371173859),
@@ -110,12 +116,7 @@ def test_convert_imagenet_inception_v3(temp_file, imagenet_dictionary):
 
 
 def test_convert_imagenet_mobilenet(temp_file, imagenet_dictionary):
-    model_name = 'mobilenet_v1'
-    tf_model_dir = setup_model(model_name, temp_file)
-    KerasToTensorflow.convert(temp_file, tf_model_dir)
-    assert_converted_model(tf_model_dir)
-    restart_serving_container(model_name)
-    assert_model_serving(model_name, imagenet_dictionary, [
+    assert_model_conversion_and_prediction(temp_file, imagenet_dictionary, 'mobilenet_v1', [
         ('tiger cat', 0.334694504737854),
         ('Egyptian cat', 0.2851393222808838),
         ('tabby, tabby cat', 0.15471667051315308),
@@ -125,12 +126,7 @@ def test_convert_imagenet_mobilenet(temp_file, imagenet_dictionary):
 
 
 def test_convert_imagenet_resnet50(temp_file, imagenet_dictionary):
-    model_name = 'resnet50'
-    tf_model_dir = setup_model(model_name, temp_file)
-    KerasToTensorflow.convert(temp_file, tf_model_dir)
-    assert_converted_model(tf_model_dir)
-    restart_serving_container(model_name)
-    assert_model_serving(model_name, imagenet_dictionary, [
+    assert_model_conversion_and_prediction(temp_file, imagenet_dictionary, 'resnet50', [
         ('red fox, Vulpes vulpes', 0.3193315863609314),
         ('kit fox, Vulpes macrotis', 0.19359852373600006),
         ('weasel', 0.14291106164455414),
@@ -140,12 +136,7 @@ def test_convert_imagenet_resnet50(temp_file, imagenet_dictionary):
 
 
 def test_convert_imagenet_xception(temp_file, imagenet_dictionary):
-    model_name = 'xception'
-    tf_model_dir = setup_model(model_name, temp_file)
-    KerasToTensorflow.convert(temp_file, tf_model_dir)
-    assert_converted_model(tf_model_dir)
-    restart_serving_container(model_name)
-    assert_model_serving(model_name, imagenet_dictionary, [
+    assert_model_conversion_and_prediction(temp_file, imagenet_dictionary, 'xception', [
         ('red fox, Vulpes vulpes', 0.10058529675006866),
         ('weasel', 0.09152575582265854),
         ('Pembroke, Pembroke Welsh corgi', 0.07581676542758942),
@@ -155,12 +146,7 @@ def test_convert_imagenet_xception(temp_file, imagenet_dictionary):
 
 
 def test_convert_imagenet_vgg16(temp_file, imagenet_dictionary):
-    model_name = 'vgg16'
-    tf_model_dir = setup_model(model_name, temp_file)
-    KerasToTensorflow.convert(temp_file, tf_model_dir)
-    assert_converted_model(tf_model_dir)
-    restart_serving_container(model_name)
-    assert_model_serving(model_name, imagenet_dictionary, [
+    assert_model_conversion_and_prediction(temp_file, imagenet_dictionary, 'vgg16', [
         ('kit fox, Vulpes macrotis', 0.3090206980705261),
         ('red fox, Vulpes vulpes', 0.21598483622074127),
         ('Egyptian cat', 0.1327403038740158),
@@ -170,12 +156,37 @@ def test_convert_imagenet_vgg16(temp_file, imagenet_dictionary):
 
 
 def test_convert_imagenet_vgg19(temp_file, imagenet_dictionary):
-    model_name = 'vgg19'
-    tf_model_dir = setup_model(model_name, temp_file)
-    KerasToTensorflow.convert(temp_file, tf_model_dir)
-    assert_converted_model(tf_model_dir)
-    restart_serving_container(model_name)
-    assert_model_serving(model_name, imagenet_dictionary, [
+    assert_model_conversion_and_prediction(temp_file, imagenet_dictionary, 'vgg19', [
+        ('red fox, Vulpes vulpes', 0.3812929391860962),
+        ('kit fox, Vulpes macrotis', 0.27262774109840393),
+        ('tiger cat', 0.08553500473499298),
+        ('lynx, catamount', 0.05379556491971016),
+        ('Egyptian cat', 0.047869954258203506)
+    ])
+
+
+def test_convert_imagenet_inception_resnet_v2(temp_file, imagenet_dictionary):
+    assert_model_conversion_and_prediction(temp_file, imagenet_dictionary, 'inception_resnet_v2', [
+        ('red fox, Vulpes vulpes', 0.3812929391860962),
+        ('kit fox, Vulpes macrotis', 0.27262774109840393),
+        ('tiger cat', 0.08553500473499298),
+        ('lynx, catamount', 0.05379556491971016),
+        ('Egyptian cat', 0.047869954258203506)
+    ])
+
+
+def test_convert_imagenet_inception_v4(temp_file, imagenet_dictionary):
+    assert_model_conversion_and_prediction(temp_file, imagenet_dictionary, 'inception_v4', [
+        ('red fox, Vulpes vulpes', 0.3812929391860962),
+        ('kit fox, Vulpes macrotis', 0.27262774109840393),
+        ('tiger cat', 0.08553500473499298),
+        ('lynx, catamount', 0.05379556491971016),
+        ('Egyptian cat', 0.047869954258203506)
+    ])
+
+
+def test_convert_imagenet_resnet152(temp_file, imagenet_dictionary):
+    assert_model_conversion_and_prediction(temp_file, imagenet_dictionary, 'resnet152', [
         ('red fox, Vulpes vulpes', 0.3812929391860962),
         ('kit fox, Vulpes macrotis', 0.27262774109840393),
         ('tiger cat', 0.08553500473499298),

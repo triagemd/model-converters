@@ -1,7 +1,8 @@
 -e .
 
-# *just for tests*, since we check prediction output (which changes across model versions)
-keras==2.0.6
+# *just for tests*, since we check prediction output
+# needs to be frozen since predictions apparently changes across model versions
+Keras==2.0.9
 
 pillow
 ml-tools>=0.0.6
