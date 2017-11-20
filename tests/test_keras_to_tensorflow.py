@@ -9,6 +9,7 @@ from tensorflow_serving_client import TensorflowServingClient
 
 from model_converters import KerasToTensorflow
 from ml_tools import load_image, get_model_spec
+import keras_model_specs.model_spec as model_spec
 
 
 MODEL_SERVING_PORTS = {
@@ -19,6 +20,14 @@ MODEL_SERVING_PORTS = {
     'vgg16': 9005,
     'vgg19': 9006,
 }
+
+
+def assert_lists_same_items(list1, list2):
+    assert sorted(list1) == sorted(list2)
+
+
+def test_convert_tests_cover_all_model_types():
+    assert_lists_same_items(model_spec.BASE_SPEC_NAMES, MODEL_SERVING_PORTS.keys())
 
 
 def setup_model(name, model_path):

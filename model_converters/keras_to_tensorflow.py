@@ -1,6 +1,7 @@
 import os
 import keras
 import tensorflow
+from keras_model_specs.models.custom_layers import Scale
 
 
 class KerasToTensorflow(object):
@@ -10,7 +11,10 @@ class KerasToTensorflow(object):
         custom_objects = {
             # just in case you have Lambda layers which implicitly 'import tensorflow as tf'
             # (happens to be the case for some of our internal code)
-            'tf': tensorflow
+            'tf': tensorflow,
+
+            # needed for Resnet152 support
+            'Scale': Scale
         }
         try:
             # for mobilenet import, doesn't affect other model types
