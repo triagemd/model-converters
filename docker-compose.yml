@@ -42,3 +42,24 @@ services:
     ports:
       - "9006:9000"
     command: "tensorflow_model_server --port=9000 --model_name=model --model_base_path=/model"
+  inception_resnet_v2:
+    image: triage/python2.7-tensorflow-serving
+    volumes:
+      - .cache/models/inception_resnet_v2:/model/1
+    ports:
+      - "9007:9000"
+    command: "tensorflow_model_server --port=9000 --model_name=model --model_base_path=/model"
+  inception_v4:
+    image: triage/python2.7-tensorflow-serving
+    volumes:
+      - .cache/models/inception_v4:/model/1
+    ports:
+      - "9008:9000"
+    command: "tensorflow_model_server --port=9000 --model_name=model --model_base_path=/model"
+  resnet152:
+    image: triage/python2.7-tensorflow-serving
+    volumes:
+      - .cache/models/resnet152:/model/1
+    ports:
+      - "9009:9000"
+    command: "tensorflow_model_server --port=9000 --model_name=model --model_base_path=/model"
