@@ -15,7 +15,8 @@ before_install:
   - script/up
 
 script:
-  - script/test
+  # the tests take > 10 minutes, travis_wait is to avoid the timeout
+  - travis_wait script/test
 
 after_success:
   - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" && "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" == "false" ]]; then

@@ -1,9 +1,5 @@
 -e .
 
-# *just for tests*, since we check prediction output
-# needs to be frozen since predictions apparently changes across model versions
-Keras==2.0.9
-
 pillow
 ml-tools>=0.0.6
 tensorflow-serving-client>=0.0.5
@@ -14,6 +10,4 @@ flake8
 autoflake
 pep8
 autopep8
-requests
-backports.tempfile
 numpy
