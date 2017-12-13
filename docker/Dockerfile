@@ -14,6 +14,9 @@ RUN mkdir /pip && \
 # note: don't install model-converters here, since it declares a dependency on tensorflow and keras (so those will be installed too)
 #       which is a waste of space since they get reinstalled in the entrypoint
 
+ENV LC_ALL C.UTF-8
+ENV LANG C.UTF-8
+
 ADD entrypoint.sh /opt/
 
 CMD ["/opt/entrypoint.sh"]
