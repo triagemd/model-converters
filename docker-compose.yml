@@ -63,3 +63,31 @@ services:
     ports:
       - "9009:9000"
     command: "tensorflow_model_server --port=9000 --model_name=model --model_base_path=/model"
+  densenet_121:
+    image: triage/python2.7-tensorflow-serving
+    volumes:
+      - .cache/models/densenet_121:/model/1
+    ports:
+      - "9010:9000"
+    command: "tensorflow_model_server --port=9000 --model_name=model --model_base_path=/model"
+  densenet_169:
+    image: triage/python2.7-tensorflow-serving
+    volumes:
+      - .cache/models/densenet_169:/model/1
+    ports:
+      - "9011:9000"
+    command: "tensorflow_model_server --port=9000 --model_name=model --model_base_path=/model"
+  densenet_201:
+    image: triage/python2.7-tensorflow-serving
+    volumes:
+      - .cache/models/densenet_201:/model/1
+    ports:
+      - "9012:9000"
+    command: "tensorflow_model_server --port=9000 --model_name=model --model_base_path=/model"
+  nasnet_mobile:
+    image: triage/python2.7-tensorflow-serving
+    volumes:
+      - .cache/models/nasnet_mobile:/model/1
+    ports:
+      - "9013:9000"
+    command: "tensorflow_model_server --port=9000 --model_name=model --model_base_path=/model"
