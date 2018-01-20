@@ -5,6 +5,7 @@ import socket
 import subprocess
 import numpy as np
 from tempfile import NamedTemporaryFile
+import sys
 
 from tensorflow_serving_client import TensorflowServingClient
 
@@ -23,7 +24,23 @@ MODEL_SERVING_PORTS = {
     'inception_resnet_v2': 9007,
     'inception_v4': 9008,
     'resnet152': 9009,
+    'densenet_121': 9010,
+    'densenet_169': 9011,
+    'densenet_201': 9012,
+    'nasnet_large': None,  # takes too long
+    'nasnet_mobile': 9013,
 }
+# no idea why the Python 2 CI won't run these models (they run out of memory)
+if sys.version_info[0] == 2:
+    MODEL_SERVING_PORTS['inception_v4'] = None
+    MODEL_SERVING_PORTS['nasnet_mobile'] = None
+    MODEL_SERVING_PORTS['resnet152'] = None
+    MODEL_SERVING_PORTS['inception_resnet_v2'] = None
+# no idea why the Python 3.6 CI won't run these models (they run out of memory)
+if sys.version_info[:2] == (3, 6):
+    MODEL_SERVING_PORTS['densenet_169'] = None
+    MODEL_SERVING_PORTS['densenet_201'] = None
+    MODEL_SERVING_PORTS['resnet152'] = None
 
 
 def assert_lists_same_items(list1, list2):
@@ -57,8 +74,8 @@ def setup_model(name, model_path):
     return tf_model_dir, expected_scores
 
 
-def restart_serving_container(model_name):
-    subprocess.call(['docker-compose', 'restart', model_name])
+def start_serving_container(model_name):
+    subprocess.call(['docker-compose', 'up', '-d', model_name])
     attempt = 0
     while attempt <= 60:
         attempt += 1
@@ -70,6 +87,10 @@ def restart_serving_container(model_name):
         except socket.error:
             pass
         time.sleep(1)
+
+
+def kill_serving_container(model_name):
+    subprocess.call(['docker-compose', 'stop', model_name])
 
 
 def assert_converted_model(tf_model_dir):
@@ -98,10 +119,16 @@ def test_convert_tests_cover_all_model_types():
 
 def test_converted_models_have_same_scores():
     for model_name in MODEL_SERVING_PORTS:
+        if MODEL_SERVING_PORTS[model_name] is None:
+            continue
+        print('Testing model ' + model_name)
+
         with NamedTemporaryFile() as f:
             temp_file = f.name
             tf_model_dir, expected_scores = setup_model(model_name, temp_file)
             KerasToTensorflow.convert(temp_file, tf_model_dir)
+
             assert_converted_model(tf_model_dir)
-            restart_serving_container(model_name)
+            start_serving_container(model_name)
             assert_model_serving(model_name, expected_scores)
+            kill_serving_container(model_name)
