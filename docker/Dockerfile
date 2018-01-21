@@ -4,8 +4,8 @@ FROM debian:latest
 RUN apt-get -y update && \
     apt-get -y install python-pip python3-pip && \
     apt-get -y clean && \
-    pip2 install --upgrade --upgrade-strategy=eager pip stored && \
-    pip3 install --upgrade --upgrade-strategy=eager pip stored
+    pip2 install --upgrade --upgrade-strategy=eager --no-cache-dir pip stored && \
+    pip3 install --upgrade --upgrade-strategy=eager --no-cache-dir pip stored
 
 # we install these packages at runtime in the entrypoint, but might as well fetch the latest version into the container
 RUN mkdir /pip && \

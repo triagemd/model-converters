@@ -110,7 +110,7 @@ def assert_model_serving(model_name, expected_scores):
     assert len(result['class_probabilities']) == 1
 
     scores = result['class_probabilities'][0]
-    np.testing.assert_array_almost_equal_nulp(np.array(scores), np.array(expected_scores))
+    np.testing.assert_array_almost_equal(np.array(scores), np.array(expected_scores).flatten())
 
 
 def test_convert_tests_cover_all_model_types():
