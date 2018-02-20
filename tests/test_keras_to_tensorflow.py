@@ -36,11 +36,7 @@ if sys.version_info[0] == 2:
     MODEL_SERVING_PORTS['nasnet_mobile'] = None
     MODEL_SERVING_PORTS['resnet152'] = None
     MODEL_SERVING_PORTS['inception_resnet_v2'] = None
-# no idea why the Python 3.6 CI won't run these models (they run out of memory)
-if sys.version_info[:2] == (3, 6):
     MODEL_SERVING_PORTS['densenet_169'] = None
-    MODEL_SERVING_PORTS['densenet_201'] = None
-    MODEL_SERVING_PORTS['resnet152'] = None
 
 
 def assert_lists_same_items(list1, list2):

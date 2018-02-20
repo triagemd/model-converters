@@ -4,5 +4,11 @@ ARGS="${@:-tests/}"
 set -e
 
 # Run the tests and linting checks
-PYTHONPATH="." pytest -v -s $ARGS
+PYTHONPATH="." pytest --cov=./ -v -s $ARGS
 flake8 --max-line-length 50000 model_converters tests
+
+# Upload coverage for CI.
+if [ -n "$CI" ]; then
+  pip install codecov
+  codecov
+fi
