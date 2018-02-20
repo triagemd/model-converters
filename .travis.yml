@@ -4,28 +4,24 @@ language: python
 
 python:
   - 2.7
-  - 3.4
+  # for some reason, tests on 3.6 (but not 3.5) seem to run out of memory here but do work fine locally -- not sure what the issue is
   - 3.5
-  - 3.6
 
 services:
   - docker
 
 before_install:
-  # Apparently TF 1.5.0 is broken and crashes on Travis (possibly glibc version?). This can probably be removed at some point.
-  - if [[ "$TRAVIS_PYTHON_VERSION" == "3.6" ]]; then
-      pip install tensorflow==1.4.1;
-    fi
   - script/up
 
 script:
   - script/test
 
-after_success:
-  - if [[ "$TRAVIS_PYTHON_VERSION" == "2.7" && "$TRAVIS_BRANCH" == "master" && "$TRAVIS_PULL_REQUEST" == "false" ]]; then
-      docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD";
-      script/distribute-docker;
-      if [[ "$TRAVIS_EVENT_TYPE" != "cron" ]]; then
-        script/distribute-pypi;
-      fi
-    fi
+jobs:
+  include:
+    - stage: distribute
+      if: branch = master AND type != pull_request
+      install: skip
+      script:
+       - docker login -u="$DOCKER_USERNAME" -p="$DOCKER_PASSWORD"
+       - script/distribute-docker
+       - if [[ "$TRAVIS_EVENT_TYPE" != "cron" ]]; then script/distribute-pypi; fi
