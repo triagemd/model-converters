@@ -5,11 +5,11 @@ import socket
 import subprocess
 import numpy as np
 import sys
-import tensorflow as tf
 
 from tempfile import NamedTemporaryFile
 from tensorflow_serving_client import TensorflowServingClient
 from model_converters import KerasToTensorflow
+from ml_tools import load_image
 from keras_model_specs import ModelSpec
 from keras_model_specs.model_spec import BASE_SPEC_NAMES
 
@@ -44,10 +44,8 @@ def assert_lists_same_items(list1, list2):
 
 
 def cat_image(model_spec):
-    sess = tf.Session()
-    sess.run(tf.global_variables_initializer())
-    with sess.as_default():
-        return model_spec.load_image('tests/fixtures/files/cat.jpg').eval()
+    return load_image('tests/fixtures/files/cat.jpg', model_spec.target_size,
+                      preprocess_input=model_spec.preprocess_input)
 
 
 def setup_model(name, model_path):
