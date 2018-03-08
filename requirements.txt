@@ -1,7 +1,7 @@
 -e .
 
 pillow
-ml-tools>=0.0.6
+ml-tools
 tensorflow-serving-client>=0.0.5
 
 pytest

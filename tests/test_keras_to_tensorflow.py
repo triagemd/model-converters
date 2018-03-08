@@ -4,14 +4,14 @@ import shutil
 import socket
 import subprocess
 import numpy as np
-from tempfile import NamedTemporaryFile
 import sys
 
+from tempfile import NamedTemporaryFile
 from tensorflow_serving_client import TensorflowServingClient
-
 from model_converters import KerasToTensorflow
-from ml_tools import load_image, get_model_spec
-import keras_model_specs.model_spec as model_spec
+from ml_tools import load_image
+from keras_model_specs import ModelSpec
+from keras_model_specs.model_spec import BASE_SPEC_NAMES
 
 
 MODEL_SERVING_PORTS = {
@@ -51,7 +51,7 @@ def cat_image(model_spec):
 def setup_model(name, model_path):
     tf_model_dir = '.cache/models/%s' % (name, )
 
-    model_spec = get_model_spec(name)
+    model_spec = ModelSpec.get(name)
     model = model_spec.klass(weights='imagenet', input_shape=tuple(model_spec.target_size))
     model_dir = os.path.dirname(model_path)
     if not os.path.exists(model_dir):
@@ -98,7 +98,7 @@ def assert_converted_model(tf_model_dir):
 
 
 def assert_model_serving(model_name, expected_scores):
-    model_spec = get_model_spec(model_name)
+    model_spec = ModelSpec.get(model_name)
     client = TensorflowServingClient('localhost', MODEL_SERVING_PORTS[model_name])
     result = client.make_prediction(cat_image(model_spec), 'image')
 
@@ -110,7 +110,7 @@ def assert_model_serving(model_name, expected_scores):
 
 
 def test_convert_tests_cover_all_model_types():
-    assert_lists_same_items(model_spec.BASE_SPEC_NAMES, MODEL_SERVING_PORTS.keys())
+    assert_lists_same_items(BASE_SPEC_NAMES, MODEL_SERVING_PORTS.keys())
 
 
 def test_converted_models_have_same_scores():
