@@ -8,7 +8,6 @@ import numpy as np
 from tempfile import NamedTemporaryFile
 from tensorflow_serving_client import TensorflowServingClient
 from model_converters import KerasToTensorflow
-from ml_tools import load_image
 from keras_model_specs import ModelSpec
 
 
@@ -20,8 +19,7 @@ def assert_lists_same_items(list1, list2):
 
 
 def cat_image(model_spec):
-    return load_image('tests/fixtures/files/cat.jpg', model_spec.target_size,
-                      preprocess_input=model_spec.preprocess_input)
+    return model_spec.load_image('tests/fixtures/files/cat.jpg')
 
 
 def setup_model(name, model_path):
