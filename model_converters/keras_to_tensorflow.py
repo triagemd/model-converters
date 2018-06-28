@@ -2,6 +2,12 @@ import os
 import keras
 import tensorflow
 from keras_model_specs.models.custom_layers import Scale
+try:
+    # for newer versions of Keras
+    import keras_applications
+except ImportError:
+    # for older versions of Keras
+    import keras.applications as keras_applications
 
 
 class KerasToTensorflow(object):
@@ -18,8 +24,8 @@ class KerasToTensorflow(object):
         }
         try:
             # for mobilenet import, doesn't affect other model types
-            custom_objects['relu6'] = keras.applications.mobilenet.relu6
-            custom_objects['DepthwiseConv2D'] = keras.applications.mobilenet.DepthwiseConv2D
+            custom_objects['relu6'] = keras_applications.mobilenet.relu6
+            custom_objects['DepthwiseConv2D'] = keras_applications.mobilenet.DepthwiseConv2D
         except AttributeError:
             pass
 
