@@ -24,7 +24,7 @@ class KerasToTensorflow(object):
         }
         try:
             # for mobilenet import, doesn't affect other model types
-            custom_objects['relu6'] = keras_applications.mobilenet.relu6
+            custom_objects['relu6'] = keras_applications.mobilenet.layers.ReLU(6, name='relu6')
             custom_objects['DepthwiseConv2D'] = keras_applications.mobilenet.DepthwiseConv2D
         except AttributeError:
             pass
