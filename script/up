@@ -2,5 +2,5 @@
 set -e
 . script/env
 pip install --upgrade pip
-pip install -r requirements.txt
+pip install --upgrade -r requirements.txt
 mkdir -p .cache/models

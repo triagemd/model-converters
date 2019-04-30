@@ -22,19 +22,20 @@ jobs:
     - python: 3.6
 
     # other models
-    - env: MODEL_NAME=inception_v3
-    - env: MODEL_NAME=inception_v4
     - env: MODEL_NAME=inception_resnet_v2
-    - env: MODEL_NAME=resnet50
-    - env: MODEL_NAME=resnet152
-    - env: MODEL_NAME=densenet_121
-    - env: MODEL_NAME=densenet_169
-    - env: MODEL_NAME=densenet_201
     - env: MODEL_NAME=nasnet_mobile
-    - env: MODEL_NAME=nasnet_large
+    - env: MODEL_NAME=resnet152
+    - env: MODEL_NAME=densenet_201
+    - env: MODEL_NAME=densenet_169
+    - env: MODEL_NAME=densenet_121
+    - env: MODEL_NAME=inception_v4
+    - env: MODEL_NAME=inception_v3
     - env: MODEL_NAME=xception
+    - env: MODEL_NAME=resnet50
     - env: MODEL_NAME=vgg16
     - env: MODEL_NAME=vgg19
+    # out of memory error
+    #- env: MODEL_NAME=nasnet_large
 
     - stage: distribute
       if: branch = master AND type != pull_request
