@@ -18,6 +18,7 @@ class KerasToTensorflow(object):
             # just in case you have Lambda layers which implicitly 'import tensorflow as tf'
             # (happens to be the case for some of our internal code)
             'tf': tensorflow,
+            'os': os,
 
             # needed for Resnet152 support
             'Scale': Scale
