@@ -4,6 +4,7 @@ import shutil
 import socket
 import subprocess
 import numpy as np
+import pytest
 
 from tempfile import NamedTemporaryFile
 from tensorflow_serving_client import TensorflowServingClient
@@ -12,6 +13,7 @@ from keras_model_specs import ModelSpec
 
 
 MODEL_SERVING_PORT = 9001
+MODEL_NAME = os.getenv('MODEL_NAME', 'mobilenet_v1')
 
 
 def assert_lists_same_items(list1, list2):
@@ -71,7 +73,7 @@ def assert_converted_model(tf_model_dir):
     assert os.path.exists(tf_model_dir + '/saved_model.pb')
 
 
-def assert_model_serving(model_name, expected_scores):
+def assert_model_serving(model_name, expected_scores, check_features=False):
     model_spec = ModelSpec.get(model_name)
     client = TensorflowServingClient('localhost', MODEL_SERVING_PORT)
     result = client.make_prediction(cat_image(model_spec), 'image')
@@ -82,45 +84,31 @@ def assert_model_serving(model_name, expected_scores):
     scores = result['class_probabilities'][0]
     np.testing.assert_array_almost_equal(np.array(scores), np.array(expected_scores).flatten())
 
-
-def assert_model_serving_extract_features(model_name, expected_scores):
-    model_spec = ModelSpec.get(model_name)
-    client = TensorflowServingClient('localhost', MODEL_SERVING_PORT)
-    result = client.make_prediction(cat_image(model_spec), 'image')
-
-    assert 'class_probabilities' in result
-    assert len(result['class_probabilities']) == 1
-
-    scores = result['class_probabilities'][0]
-    np.testing.assert_array_almost_equal(np.array(scores), np.array(expected_scores).flatten())
-
-    assert 'image_features' in result
-    assert result['image_features'].shape == (1, 1024)
+    if check_features:
+        assert 'image_features' in result
+        assert result['image_features'].shape == (1, 1024)
 
 
 def test_converted_model_has_same_scores():
-    model_name = os.getenv('MODEL_NAME', 'mobilenet_v1')
-
     with NamedTemporaryFile() as f:
         temp_file = f.name
-        tf_model_dir, expected_scores = setup_model(model_name, temp_file)
+        tf_model_dir, expected_scores = setup_model(MODEL_NAME, temp_file)
         KerasToTensorflow.convert(temp_file, tf_model_dir)
 
         assert_converted_model(tf_model_dir)
-        start_serving_container(model_name)
-        assert_model_serving(model_name, expected_scores)
-        kill_serving_container(model_name)
+        start_serving_container(MODEL_NAME)
+        assert_model_serving(MODEL_NAME, expected_scores)
+        kill_serving_container(MODEL_NAME)
 
 
+@pytest.mark.skipif(MODEL_NAME != 'mobilenet_v1', reason='we only test image_features on mobilenet')
 def test_converted_model_image_features():
-    model_name = os.getenv('MODEL_NAME', 'mobilenet_v1')
-
     with NamedTemporaryFile() as f:
         temp_file = f.name
-        tf_model_dir, expected_scores = setup_model(model_name, temp_file)
+        tf_model_dir, expected_scores = setup_model(MODEL_NAME, temp_file)
         KerasToTensorflow.convert(temp_file, tf_model_dir, feature_layer=-6)
 
         assert_converted_model(tf_model_dir)
-        start_serving_container(model_name)
-        assert_model_serving_extract_features(model_name, expected_scores)
-        kill_serving_container(model_name)
+        start_serving_container(MODEL_NAME)
+        assert_model_serving(MODEL_NAME, expected_scores, check_features=True)
+        kill_serving_container(MODEL_NAME)
