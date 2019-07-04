@@ -13,6 +13,16 @@ except ImportError:
 class KerasToTensorflow(object):
 
     @staticmethod
+    def get_feature_layer(model, layer):
+        if isinstance(layer, int):
+            return model.layers[layer].output
+        elif isinstance(layer, str):
+            return model.get_layer(layer).output
+        else:
+            raise ValueError('Layer must be either a str or an int specifying the model layer, you inputed %s'
+                             % str(type(layer)))
+
+    @staticmethod
     def load_keras_model(model_path):
         custom_objects = {
             # just in case you have Lambda layers which implicitly 'import tensorflow as tf'
@@ -33,7 +43,7 @@ class KerasToTensorflow(object):
         return keras.models.load_model(model_path, custom_objects=custom_objects)
 
     @staticmethod
-    def convert(model_path, output_dir, output_stripped_model_path=None):
+    def convert(model_path, output_dir, feature_layer=None, output_stripped_model_path=None):
         # cut out to_multi_gpu stuff (this could possibly break some models which don't use to_multi_gpu)
         model = KerasToTensorflow.load_keras_model(model_path)
         stripped_model = next((l for l in model.layers if isinstance(l, keras.engine.training.Model)), None)
@@ -53,13 +63,19 @@ class KerasToTensorflow(object):
         model = KerasToTensorflow.load_keras_model(model_path)
 
         builder = tensorflow.saved_model.builder.SavedModelBuilder(output_dir)
+
+        signature_outputs = {
+            'class_probabilities': model.output
+        }
+
+        if feature_layer is not None:
+            signature_outputs.update({'image_features': KerasToTensorflow.get_feature_layer(model, feature_layer)})
+
         signature = tensorflow.saved_model.signature_def_utils.predict_signature_def(
             inputs={
                 'image': model.input
             },
-            outputs={
-                'class_probabilities': model.output
-            }
+            outputs=signature_outputs
         )
 
         builder.add_meta_graph_and_variables(
