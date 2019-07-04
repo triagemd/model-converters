@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='model-converters',
-    version='1.0.1',
+    version='1.1.0',
     description='Tools for converting Keras models for use with other ML frameworks.',
     author='Triage Technologies Inc.',
     author_email='ai@triage.com',
