@@ -83,6 +83,21 @@ def assert_model_serving(model_name, expected_scores):
     np.testing.assert_array_almost_equal(np.array(scores), np.array(expected_scores).flatten())
 
 
+def assert_model_serving_extract_features(model_name, expected_scores):
+    model_spec = ModelSpec.get(model_name)
+    client = TensorflowServingClient('localhost', MODEL_SERVING_PORT)
+    result = client.make_prediction(cat_image(model_spec), 'image')
+
+    assert 'class_probabilities' in result
+    assert len(result['class_probabilities']) == 1
+
+    scores = result['class_probabilities'][0]
+    np.testing.assert_array_almost_equal(np.array(scores), np.array(expected_scores).flatten())
+
+    assert 'image_features' in result
+    assert result['image_features'].shape == (1, 1024)
+
+
 def test_converted_model_has_same_scores():
     model_name = os.getenv('MODEL_NAME', 'mobilenet_v1')
 
@@ -94,4 +109,18 @@ def test_converted_model_has_same_scores():
         assert_converted_model(tf_model_dir)
         start_serving_container(model_name)
         assert_model_serving(model_name, expected_scores)
+        kill_serving_container(model_name)
+
+
+def test_converted_model_image_features():
+    model_name = os.getenv('MODEL_NAME', 'mobilenet_v1')
+
+    with NamedTemporaryFile() as f:
+        temp_file = f.name
+        tf_model_dir, expected_scores = setup_model(model_name, temp_file)
+        KerasToTensorflow.convert(temp_file, tf_model_dir, feature_layer=-6)
+
+        assert_converted_model(tf_model_dir)
+        start_serving_container(model_name)
+        assert_model_serving_extract_features(model_name, expected_scores)
         kill_serving_container(model_name)
