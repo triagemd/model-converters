@@ -4,7 +4,15 @@ import sys
 from model_converters import KerasToTensorflow
 
 if __name__ == '__main__':
-    if len(sys.argv) != 3 or not (sys.argv[1].endswith('.h5') or sys.argv[1].endswith('.hdf5')):
-        print('Usage: keras_to_tensorflow <hdf5_model_file> <output_dir>')
+    if len(sys.argv) <= 2 or len(sys.argv) > 4 or not (sys.argv[1].endswith('.h5') or sys.argv[1].endswith('.hdf5')):
+        print('Usage: keras_to_tensorflow <hdf5_model_file> <output_dir> <feature_layer>')
         sys.exit(1)
-    KerasToTensorflow.convert(sys.argv[1], sys.argv[2])
+
+    if len(sys.argv) == 4:
+        try:
+            feature_layer = int(sys.argv[3])
+        except:
+            feature_layer = sys.argv[3]
+        KerasToTensorflow.convert(sys.argv[1], sys.argv[2], feature_layer=feature_layer)
+    else:
+        KerasToTensorflow.convert(sys.argv[1], sys.argv[2])
