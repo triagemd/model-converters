@@ -11,7 +11,14 @@ As a Python package:
 `pip install --upgrade model-converters`
 
 As a Docker image:
-`docker run --rm -i -e MODEL_INPUT=<stored-compatible path> -e MODEL_OUTPUT=<stored-compatible path> -e PYTHON_VERSION=<2 or 3> -e KERAS_VERSION=<...> -e TENSORFLOW_VERSION=<...> triage/model-converter:latest`
+```bash
+docker run --rm -i -e MODEL_INPUT=<stored-compatible path> \
+				   -e MODEL_OUTPUT=<stored-compatible path> \
+				   -e PYTHON_VERSION=<2 or 3> \
+				   -e KERAS_VERSION=<...> \
+				   -e TENSORFLOW_VERSION=<...> \
+				   triage/model-converter:latest
+```
 (you can add mounts if you want to use a local file)
 
 
