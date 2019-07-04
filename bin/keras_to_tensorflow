@@ -9,6 +9,10 @@ if __name__ == '__main__':
         sys.exit(1)
 
     if len(sys.argv) == 4:
-        KerasToTensorflow.convert(sys.argv[1], sys.argv[2], feature_layer=sys.argv[3])
+        try:
+            feature_layer = int(sys.argv[3])
+        except:
+            feature_layer = sys.argv[3]
+        KerasToTensorflow.convert(sys.argv[1], sys.argv[2], feature_layer=feature_layer)
     else:
         KerasToTensorflow.convert(sys.argv[1], sys.argv[2])
