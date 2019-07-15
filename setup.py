@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='model-converters',
-    version='1.1.1',
+    version='1.2.0',
     description='Tools for converting Keras models for use with other ML frameworks.',
     author='Triage Technologies Inc.',
     author_email='ai@triage.com',
@@ -16,9 +16,8 @@ setup(
     ],
     install_requires=[
         'tensorflow >= 0.12.0',
-        'Keras >= 1.0.7',
+        'Keras >= 2.2.0',
         'h5py',
-        'keras_model_specs',
-        #'coremltools' <- NOTE!: coremltools is currently Python 2.7 only
+        'keras_model_specs'
     ]
 )

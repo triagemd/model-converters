@@ -1,7 +1,7 @@
 -e .
 
 pillow
-tensorflow==1.7.0
+tensorflow==1.*
 tensorflow-serving-client>=0.0.5
 
 pytest

@@ -2,12 +2,6 @@ import os
 import keras
 import tensorflow
 from keras_model_specs.models.custom_layers import Scale
-try:
-    # for newer versions of Keras
-    import keras_applications
-except ImportError:
-    # for older versions of Keras
-    import keras.applications as keras_applications
 
 
 class KerasToTensorflow(object):
@@ -31,14 +25,12 @@ class KerasToTensorflow(object):
             'os': os,
 
             # needed for Resnet152 support
-            'Scale': Scale
+            'Scale': Scale,
+
+            # for mobilenets
+            'relu6': keras.layers.ReLU(6, name='relu6'),
+            'DepthwiseConv2D': keras.layers.DepthwiseConv2D
         }
-        try:
-            # for mobilenet import, doesn't affect other model types
-            custom_objects['relu6'] = keras_applications.mobilenet.layers.ReLU(6, name='relu6')
-            custom_objects['DepthwiseConv2D'] = keras_applications.mobilenet.DepthwiseConv2D
-        except AttributeError:
-            pass
 
         return keras.models.load_model(model_path, custom_objects=custom_objects)
 
