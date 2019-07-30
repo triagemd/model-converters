@@ -19,4 +19,4 @@ ENV LANG C.UTF-8
 
 ADD entrypoint.sh /opt/
 
-CMD ["/opt/entrypoint.sh"]
+ENTRYPOINT ["/opt/entrypoint.sh"]
