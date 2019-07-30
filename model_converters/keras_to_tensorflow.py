@@ -1,7 +1,6 @@
 import os
 import keras
 import tensorflow
-from keras_model_specs.models.custom_layers import Scale
 
 
 class KerasToTensorflow(object):
@@ -23,9 +22,6 @@ class KerasToTensorflow(object):
             # (happens to be the case for some of our internal code)
             'tf': tensorflow,
             'os': os,
-
-            # needed for Resnet152 support
-            'Scale': Scale,
 
             # for mobilenets
             'relu6': keras.layers.ReLU(6, name='relu6'),
