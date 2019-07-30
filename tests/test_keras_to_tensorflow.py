@@ -46,7 +46,7 @@ def setup_model(name, model_path):
     return tf_model_dir, expected_scores
 
 
-def start_serving_container(model_name):
+def start_serving_container():
     subprocess.call(['docker-compose', 'up', '-d', 'tf-serving'])
     attempt = 0
     while attempt <= 60:
@@ -61,7 +61,7 @@ def start_serving_container(model_name):
         time.sleep(1)
 
 
-def kill_serving_container(model_name):
+def kill_serving_container():
     subprocess.call(['docker-compose', 'stop', 'tf-serving'])
 
 
@@ -96,9 +96,9 @@ def test_converted_model_has_same_scores():
         KerasToTensorflow.convert(temp_file, tf_model_dir)
 
         assert_converted_model(tf_model_dir)
-        start_serving_container(MODEL_NAME)
+        start_serving_container()
         assert_model_serving(MODEL_NAME, expected_scores)
-        kill_serving_container(MODEL_NAME)
+        kill_serving_container()
 
 
 @pytest.mark.skipif(MODEL_NAME != 'mobilenet_v1', reason='we only test image_features on mobilenet')
@@ -109,6 +109,6 @@ def test_converted_model_image_features():
         KerasToTensorflow.convert(temp_file, tf_model_dir, feature_layer=-6)
 
         assert_converted_model(tf_model_dir)
-        start_serving_container(MODEL_NAME)
+        start_serving_container()
         assert_model_serving(MODEL_NAME, expected_scores, check_features=True)
-        kill_serving_container(MODEL_NAME)
+        kill_serving_container()

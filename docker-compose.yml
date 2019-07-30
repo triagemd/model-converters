@@ -1,7 +1,7 @@
 version: '3'
 services:
   tf-serving:
-    image: triage/python2.7-tensorflow-serving
+    image: tensorflow/serving:latest
     volumes:
       - .cache/model:/model/1
     ports:

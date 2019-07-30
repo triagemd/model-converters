@@ -24,7 +24,8 @@ jobs:
     # other models
     - env: MODEL_NAME=inception_resnet_v2
     - env: MODEL_NAME=nasnet_mobile
-    - env: MODEL_NAME=resnet152
+    # not available in keras.applications yet
+    #- env: MODEL_NAME=resnet152
     - env: MODEL_NAME=densenet_201
     - env: MODEL_NAME=densenet_169
     - env: MODEL_NAME=densenet_121
