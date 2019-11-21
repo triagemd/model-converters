@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -e
 . script/env
+
 pip install --upgrade pip
 pip install --upgrade -r requirements.txt
+
 mkdir -p .cache/models

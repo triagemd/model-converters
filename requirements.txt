@@ -2,7 +2,8 @@
 
 pillow
 tensorflow==1.*
-tensorflow-serving-client>=0.0.5
+tensorflow-serving-client==1.*
+keras-model-specs==1.*
 
 pytest
 pytest-cov
